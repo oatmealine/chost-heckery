@@ -1,0 +1,322 @@
+version = 1
+title = 'not plasma'
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<style>
+  .container {
+    position: relative;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 360px;
+    margin-bottom: -16px;
+  }
+  .container-2 {
+    width: calc(100% + 28px);
+    height: 360px;
+    position: absolute;
+    top: -16px;
+    left: -16px;
+    overflow: hidden;
+  }
+  .the-big {
+    background-color: #000;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .segment {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+  
+  .segment-size {
+    width: 100%;
+    height: 100%;
+  }
+  .slide {
+    position: relative;
+    animation: 1s spin linear infinite;
+    transform: translate(64px, 0px);
+    left: -64px;
+    width: calc(100% + 64px);
+    height: 100%;
+  }
+  
+  .add {
+    mix-blend-mode: screen;
+  }
+  .sub {
+    mix-blend-mode: difference;
+  }
+  .slowscale {
+    animation: 1s spin ease-in-out infinite;
+    animation-direction: alternate;
+    transform: scale(1.8, 1.8);
+  }
+  .slowspin {
+    animation: 1s spin linear infinite;
+  }
+  .unslowspin {
+    animation: 1s spin linear infinite;
+    animation-direction: reverse;
+  }
+  .scale {
+    transform: scale(5.6, 5.6);
+  }
+  .scale-2 {
+    transform: scale(3.2, 3.2);
+  }
+  .scale-3 {
+    transform: scale(6, 6);
+  }
+
+  .anim-dur-1 {
+    animation-duration: 23s;
+  }
+  .anim-dur-s-1 {
+    animation-duration: 7s;
+  }
+  .anim-delay-1 {
+    animation-delay: -15s;
+  }
+  .anim-dur-2 {
+    animation-duration: 17s;
+  }
+  .anim-dur-s-2 {
+    animation-duration: 4s;
+  }
+  .anim-delay-2 {
+    animation-delay: -2s;
+  }
+  .anim-dur-3 {
+    animation-duration: 21.22s;
+  }
+  .anim-dur-s-4 {
+    animation-duration: 3s;
+  }
+  .anim-delay-3 {
+    animation-delay: -9.22s;
+  }
+  .anim-ease-1 {
+    animation-timing-function: ease-in-out;
+  }
+  .anim-ease-2 {
+    animation-timing-function: cubic-bezier(.95,.34,.46,.73);
+  }
+
+  .move {
+    transform: translate(0px, 40px);
+  }
+  .move-2 {
+    transform: translate(50px, -40px);
+  }
+
+  .center-insides {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<script>
+  import filter from './filter';
+  import grad1 from './grad1';
+  import grad2 from './grad2';
+
+  const layers = 4;
+  const alpha = 1/layers;
+
+  function delay() {
+    return `animation-delay: ${Math.floor(Math.random() * -23 * 100) / 100}s;`
+  }
+</script>
+
+<div class="container">
+  <div class="container-2">
+    <div class="the-big" style="filter: url('data:image/svg+xml;base64,{btoa(filter)}#t')">
+      <div class="segment add" style="opacity:{alpha}">
+        <div class="segment-size scale">
+          <div class="segment-size slide anim-dur-s-1" style="background-image: url('data:image/svg+xml;base64,{btoa(grad1)}')">
+          </div>
+        </div>
+      </div>
+      <div class="segment add" style="opacity:{alpha}">
+        <div class="segment-size scale">
+          <div class="segment-size slowscale anim-dur-s-4 anim-delay-3">
+            <div class="segment-size slowspin anim-dur-1 anim-delay-3">
+              <div class="segment-size slide anim-dur-s-2" style="background-image: url('data:image/svg+xml;base64,{btoa(grad1)}')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="segment add" style="opacity:{alpha}">
+        <div class="segment-size scale-3">
+          <div class="segment-size slowscale anim-dur-s-4 anim-delay-3">
+            <div class="segment-size slowspin anim-dur-1 anim-delay-3">
+              <div class="segment-size slide anim-dur-s-2" style="background-image: url('data:image/svg+xml;base64,{btoa(grad1)}')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="segment add" style="opacity:{alpha}">
+        <div class="segment-size scale-3">
+          <div class="segment-size slowspin anim-dur-2 anim-delay-1 anim-ease-3">
+            <div class="segment-size move">
+              <div class="segment-size unslowspin anim-dur-2 anim-delay-1 anim-ease-3">
+                <div class="segment-size" style="background-image: url('data:image/svg+xml;base64,{btoa(grad2)}'); background-repeat: no-repeat; background-position: center;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="segment add" style="opacity:{alpha}">
+        <div class="segment-size scale-3">
+          <div class="segment-size slowspin anim-dur-2 anim-delay-1 anim-ease-3">
+            <div class="segment-size move-2">
+              <div class="segment-size unslowspin anim-dur-2 anim-delay-1 anim-ease-3">
+                <div class="segment-size" style="background-image: url('data:image/svg+xml;base64,{btoa(grad2)}'); background-repeat: no-repeat; background-position: center;">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>not plasma shader :(</p>'''
+sends = [7]
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<script>
+  function genValues(n, res, offset) {
+    return Array(res).fill(0).map((v,i) => Math.round((Math.sin((i/res + (offset || 0)) * Math.PI * n) * 0.5 + 0.5) * 10000) / 10000).join(' ');
+  }
+
+  const layers = 2.8;
+</script>
+
+<svg width="600" height="256" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id = "t" color-interpolation-filters = " sRGB ">
+      <feComponentTransfer result="dyed">
+        <feFuncR type = "table" tableValues = {genValues(layers, 64, 1.03)}/>
+        <feFuncG type = "table" tableValues = "1"/>
+        <feFuncB type = "table" tableValues = {genValues(layers, 64, -0.22)}/>
+      </feComponentTransfer>
+      <feDisplacementMap
+        in2="turbulence"
+        in="dyed"
+        scale="100"
+        xChannelSelector="R"
+        yChannelSelector="B" />
+    </filter>
+  </defs>
+</svg>'''
+sends = [2]
+namedSends = { '0' = ['filter'] }
+
+[[modules]]
+plugin = 'transform.svgo'
+data = { }
+namedSends = { '0' = ['filter2'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = '''
+<svg width="64" height="64" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g">
+      <stop class="stop1" offset="0%" stop-color="#000" />
+      <stop class="stop2" offset="50%" stop-color="#fff" />
+      <stop class="stop3" offset="100%" stop-color="#000" />
+    </linearGradient>
+  </defs>
+  <rect id="r" x="0" y="0" width="64" height="64" style="fill:url(#g)"/>
+</svg>'''
+data.language = 'html'
+sends = [4]
+
+[[modules]]
+plugin = 'transform.svgo'
+data = { }
+namedSends = { '0' = ['grad1'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = '''
+<svg width="256" height="256" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="g" r="0.9">
+      <stop offset="0%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="0%;-20%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="10%" stop-color="#000">
+        <animate attributeName="offset" dur="2s" values="10%;-10%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="20%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="20%;0%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="30%" stop-color="#000">
+        <animate attributeName="offset" dur="2s" values="30%;10%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="40%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="40%;20%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="50%" stop-color="#000">
+        <animate attributeName="offset" dur="2s" values="50%;30%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="60%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="60%;40%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="70%" stop-color="#000">
+        <animate attributeName="offset" dur="2s" values="70%;50%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="80%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="80%;60%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="90%" stop-color="#000">
+        <animate attributeName="offset" dur="2s" values="90%;70%"
+            repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="#fff">
+        <animate attributeName="offset" dur="2s" values="100%;80%"
+            repeatCount="indefinite" />
+      </stop>
+    </radialGradient>
+  </defs>
+  <rect id="r" x="0" y="0" width="256" height="256" style="fill:url(#g)"/>
+</svg>'''
+data.language = 'html'
+sends = [6]
+
+[[modules]]
+plugin = 'transform.svgo'
+data = { }
+namedSends = { '0' = ['grad2'] }
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']

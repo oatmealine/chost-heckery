@@ -1,0 +1,519 @@
+version = 1
+title = 'fishing minigame'
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<script>
+  import Fail from './Fail.svelte';
+  import gradient from './gradient';
+  import background from './background';
+</script>
+
+<style>
+  .button {
+    width: 48px;
+    height: 48px;
+    cursor: pointer;
+    margin: auto;
+    user-select: none;
+  }
+
+  .button-overlay {
+    background-color: #eee;
+    line-height: 1;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+
+    position: absolute;
+    width: 48px;
+    height: 48px;
+  }
+
+  .fullscreen {
+    position: absolute;
+    width: 48px;
+    height: 48px;
+  }
+
+  .side-display {
+    position: absolute;
+    left: 64px;
+    width: 210px;
+    height: 2em;
+    overflow: hidden;
+  }
+
+  .zoom-in {
+    animation: 1s spin ease-in 1;
+    animation-direction: reverse;
+    transform: scale(2, 2) translateY(40px);
+  }
+  .fishing-rod-container {
+    position: absolute;
+    top: 146px;
+  }
+  .zoom-in-container {
+    transform: translateX(-79px) translateY(-40px) scale(0.5,0.5);
+  }
+  .fishing-rod {
+    width: 206px;
+    height: 30px;
+    background-size: cover;
+    image-rendering: pixelated;
+  }
+  .spinny {
+    width: 22px;
+    height: 22px;
+    position: absolute;
+    left: 36px;
+    top: 4px;
+    image-rendering: pixelated;
+  }
+  .crank {
+    width: 44px;
+    height: 6px;
+    position: absolute;
+    top: 8px;
+    right: -10px;
+    image-rendering: pixelated;
+  }
+
+  .fade-grad {
+    width: 8192px;
+    height: 100%;
+    animation: 2s spin 1 ease-out;
+    animation-direction: reverse;
+    transform: translateX(-7982px);
+    background-size: 100% 100%;
+  }
+  .popup {
+    animation: 10s spin 1 steps(12);
+    animation-direction: reverse;
+    transform: translateX(-576px);
+    width: 100%;
+    height: 100%;
+  }
+  .popup-container {
+    transform: translateX(528px);
+  }
+  summary {
+    display: flex;
+  }
+
+  .timing {
+    animation: 3s spin 1 steps(10);
+    animation-direction: reverse;
+    transform: translateX(-480px);
+  }
+  .timing-tight {
+    animation: 2.5s spin 1 steps(10);
+    animation-direction: reverse;
+    transform: translateX(-480px);
+  }
+  .timing-container {
+    transform: translateX(432px);
+  }
+  .zoom-in-bar-container {
+    position: absolute;
+    top: 96px;
+    transform: rotate(-20deg) scale(0.01, 1);
+  }
+  .zoom-in-bar {
+    animation: 1s spin cubic-bezier(0.36, 0, 0.66, -0.56) 1;
+    animation-direction: reverse;
+    transform: scale(100, 1) rotate(20deg);
+  }
+  .timing-bar-zoomed {
+    position: absolute;
+    width: 216px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .timing-bar {
+    top: 96px;
+    position: absolute;
+    width: 216px;
+    height: 16px;
+    border-radius: 8px;
+    background-color: #fff;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .timing-bar-fill {
+    background-color: #aaf;
+    width: 100%;
+    height: 100%;
+    animation: 3s spin 1 linear;
+    animation-direction: reverse;
+    transform: translateX(100%);
+  }
+  .timing-bar-fill-tight {
+    background-color: #aaf;
+    width: 100%;
+    height: 100%;
+    animation: 2.5s spin 1 linear;
+    animation-direction: reverse;
+    transform: translateX(100%);
+  }
+  .timing-bar-container {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transform: translateX(-100%);
+  }
+  .timing-bar-indicator {
+    position: absolute;
+    height: 100%;
+    width: 10%;
+    left: 173px;
+    background-color: rgba(160, 255, 160, 0.8);
+  }
+  .green {
+    background-color: #afa;
+  }
+</style>
+
+<div style="background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 50%, #6798C5 100%);background-image:url({background});position:absolute;inset:0;background-size:cover">
+  <div style="position:relative;width:100%;height:100%;padding:1em">
+    <details class="button">
+      <summary class="button-overlay">
+        cast rod
+        <div class="side-display" style="pointer-events:none">
+          &lt;-- this will be your play area. don't move your cursor!
+        </div>
+      </summary>
+      <div class="fishing-rod-container zoom-in-container">
+        <div class="fishing-rod zoom-in" style="background-image: url('https://staging.cohostcdn.org/attachment/3aaf1d8a-b81a-43c2-b5dd-64d442b76c27/rod.png')">
+          <div class="spinny" style="background-image: url('https://staging.cohostcdn.org/attachment/382cdbe4-b533-4217-838f-a8ca137852ed/spinny.png')">
+            <div class="crank" style="background-image: url('https://staging.cohostcdn.org/attachment/8e1e5435-1147-4bc2-ac94-198b70099387/crank.png'); animation: 2s spin 1 ease-in; animation-direction: reverse; transform: rotate(-360deg)">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="button-overlay">
+        <details class="button-overlay">
+          <summary class="button-overlay">...</summary>
+          <Fail/>
+        </details>
+        <div class="side-display" style="pointer-events:none">
+          <div style="background-image: url({gradient})" class="fade-grad">
+          </div>
+        </div>
+        <details class="fullscreen" style="pointer-events:none">
+          <summary class="fullscreen" style="overflow:hidden">
+            <div class="fullscreen popup-container">
+              <div class="popup">
+                <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+              </div>
+            </div>
+          </summary>
+          <div class="button-overlay">
+            reeling
+            <div class="zoom-in-bar-container">
+              <div class="zoom-in-bar timing-bar-zoomed">
+                <div class="timing-bar-container">
+                  <div class="timing-bar-fill"></div>
+                </div>
+                <div class="timing-bar-indicator"></div>
+              </div>
+            </div>
+            <details class="fullscreen" style="pointer-events:none">
+              <summary class="fullscreen" style="overflow:hidden">
+                <div class="fullscreen timing-container">
+                  <div class="timing">
+                    <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                    <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+                  </div>
+                </div>
+              </summary>
+              <div class="button-overlay">
+                reeling
+                <div class="timing-bar">
+                  <div class="timing-bar-container">
+                    <div class="timing-bar-fill"></div>
+                  </div>
+                  <div class="timing-bar-indicator"></div>
+                </div>
+                <details class="fullscreen" style="pointer-events:none">
+                  <summary class="fullscreen" style="overflow:hidden">
+                    <div class="fullscreen timing-container">
+                      <div class="timing">
+                        <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                        <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+                      </div>
+                    </div>
+                  </summary>
+                  <div class="button-overlay">
+                reeling
+                <div class="timing-bar">
+                  <div class="timing-bar-container">
+                    <div class="timing-bar-fill"></div>
+                  </div>
+                  <div class="timing-bar-indicator"></div>
+                </div>
+                <details class="fullscreen" style="pointer-events:none">
+                  <summary class="fullscreen" style="overflow:hidden">
+                    <div class="fullscreen timing-container">
+                      <div class="timing">
+                        <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                        <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+                      </div>
+                    </div>
+                  </summary>
+                  <div class="button-overlay">
+                reeling
+                <div class="timing-bar">
+                  <div class="timing-bar-container">
+                    <div class="timing-bar-fill"></div>
+                  </div>
+                  <div class="timing-bar-indicator"></div>
+                </div>
+                <details class="fullscreen" style="pointer-events:none">
+                  <summary class="fullscreen" style="overflow:hidden">
+                    <div class="fullscreen timing-container">
+                      <div class="timing">
+                        <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                        <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+                      </div>
+                    </div>
+                  </summary>
+                  <div class="button-overlay">
+                reeling
+                <div class="timing-bar">
+                  <div class="timing-bar-container">
+                    <div class="timing-bar-fill-tight"></div>
+                  </div>
+                  <div class="timing-bar-indicator"></div>
+                </div>
+                <details class="fullscreen" style="pointer-events:none">
+                  <summary class="fullscreen" style="overflow:hidden">
+                    <div class="fullscreen timing-container">
+                      <div class="timing-tight">
+                        <div class="button-overlay green" style="pointer-events:initial">!!!</div>
+                        <div class="button-overlay" style="transform: translateX(48px)">too late!</div>
+                      </div>
+                    </div>
+                  </summary>
+                  <Fail notFail={true}/>
+                </details>
+              </div>
+                </details>
+              </div>
+                </details>
+              </div>
+                </details>
+              </div>
+            </details>
+          </div>
+          <div style="position: absolute;top:132px;left:-79px;">
+            <div class="fishing-rod" style="background-image: url('https://staging.cohostcdn.org/attachment/3aaf1d8a-b81a-43c2-b5dd-64d442b76c27/rod.png')">
+              <div class="spinny" style="background-image: url('https://staging.cohostcdn.org/attachment/382cdbe4-b533-4217-838f-a8ca137852ed/spinny.png')">
+                <div class="crank" style="background-image: url('https://staging.cohostcdn.org/attachment/8e1e5435-1147-4bc2-ac94-198b70099387/crank.png'); animation: 0.7s spin infinite linear">
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div style="height: 200px;"></div>'''
+sends = [1]
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']
+
+[[modules]]
+plugin = 'source.text'
+data.contents = '''
+<svg width="1" height="1" version="1.1" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g">
+      <stop offset="0%" stop-color="rgba(255,255,255,0)" />
+      <stop offset="100%" stop-color="rgba(255,255,255,1)" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="1" height="1" style="fill:url(#g)"/>
+</svg>'''
+data.language = 'html'
+sends = [3]
+
+[[modules]]
+plugin = 'transform.svgo'
+data = { }
+sends = [4]
+
+[[modules]]
+plugin = 'transform.to-data-url'
+data.mime = 'image/svg+xml'
+namedSends = { '0' = ['gradient'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = '''
+<svg width="256" height="256" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <filter id="s" width="256" height="256">
+      <feTurbulence
+        type="fractalNoise"
+        baseFrequency="0.05"
+        numOctaves="1"
+        result="noise" />
+      <feOffset in="noise" result="noise2">
+        <animate
+          attributeName="dx"
+          values="0;-10;0"
+          keyTimes="0; 0.5; 1"
+          calcMode="spline"
+          keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+          dur="12s"
+          repeatCount="indefinite" />
+        <animate
+          begin="6s"
+          attributeName="dy"
+          values="0;-10;0"
+          keyTimes="0; 0.5; 1"
+          calcMode="spline"
+          keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+          dur="12s"
+          repeatCount="indefinite" />
+      </feOffset>
+      <feTile in="SourceGraphic" x="0" y="0" width="35" height="35"/>
+      <feTile/>
+      <feOffset>
+        <animate
+          attributeName="dx"
+          values="0;-60;0"
+          keyTimes="0; 0.5; 1"
+          calcMode="spline"
+          keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+          dur="42s"
+          repeatCount="indefinite" />
+        <animate
+          begin="10s"
+          attributeName="dy"
+          values="0;-60;0"
+          keyTimes="0; 0.5; 1"
+          calcMode="spline"
+          keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+          dur="42s"
+          repeatCount="indefinite" />
+      </feOffset>
+      <feDisplacementMap
+        in2="noise2"
+        scale="20"
+        xChannelSelector="R"
+        yChannelSelector="G">
+        <animate
+          attributeName="scale"
+          values="20;30;20"
+          keyTimes="0; 0.5; 1"
+          calcMode="spline"
+          keySplines="0.5 0 0.5 1; 0.5 0 0.5 1"
+          dur="10s"
+          repeatCount="indefinite" />
+      </feDisplacementMap>
+    </filter>
+    <linearGradient id="g" x1="0" x2="0" y1="0" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,1)" />
+      <stop offset="10%" stop-color="rgba(255,255,255,1)" />
+      <stop offset="60%" stop-color="rgba(255,255,255,0)" />
+    </linearGradient>
+  </defs>
+  <rect x="0" y="0" width="256" height="256" style="fill:#cff5f6"/>
+  <g filter="url(#s)">
+    <rect x="0" y="0" width="64" height="64" style="fill:#cff5f6"/>
+    <rect x="0" y="0" width="32" height="32" rx="10" style="fill:#0071ba"/>
+  </g>
+  <rect x="0" y="0" width="256" height="256" style="fill:rgba(255,255,255,0.6)"/>
+  <rect x="0" y="0" width="256" height="256" style="fill:url(#g)"/>
+</svg>'''
+data.language = 'html'
+sends = [6]
+
+[[modules]]
+plugin = 'transform.svgo'
+data = { }
+sends = [7]
+
+[[modules]]
+plugin = 'transform.to-data-url'
+data.mime = 'image/svg+xml'
+namedSends = { '0' = ['background'] }
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'Fail'
+data.contents = '''
+<script>
+  export let reason = "you clicked or didn't click as needed!!!";
+  export let notFail = false;
+</script>
+
+<style>
+  .fail-overlay {
+    position: absolute;
+    z-index: 999;
+    transform: translate(-25%,-12.5%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: initial;
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.3));
+    pointer-events: initial;
+  }
+  .box {
+    padding: 1em;
+    border-radius: 18px;
+    background-color: #fff;
+    min-width: 100%;
+    text-align: center;
+
+    animation: 0.5s spin 1 ease-in;
+    animation-direction: reverse;
+    transform: translateY(25px);
+  }
+
+  .box-container {
+    transform: translateY(-5px);
+  }
+  .pop {
+    animation: 1s spin infinite ease-in-out;
+    animation-direction: alternate-reverse;
+    transform: scale(1.15, 1.15);
+  }
+  img {
+    margin: auto;
+    image-rendering: pixelated;
+  }
+</style>
+
+<div class="fail-overlay">
+  <div class="box-container">
+    <div class="box">
+      {#if !notFail}
+      <div class="pop">
+        {reason}
+      </div>
+      {:else}
+      you caught:<br>
+      <img src="https://staging.cohostcdn.org/attachment/3bb093f8-154f-479b-9f50-8a5773896f0d/eggbugfish.png" width="96" height="96"><br>
+      <b>eggbugfish</b>!<br><br>
+      thank you for playing!!
+      {/if}
+    </div>
+  </div>
+</div>'''
+namedSends = { '0' = ['Fail'] }

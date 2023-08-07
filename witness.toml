@@ -1,0 +1,274 @@
+version = 1
+title = 'witness '
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<script>
+  import Line from './Line.svelte';
+  
+  const LINE_WIDTH = 15;
+  const GRID_WIDTH = 100;
+
+  const WIDTH = 2;
+  const HEIGHT = 3;
+</script>
+
+<style>
+  .background {
+    position: absolute;
+    inset: 0;
+    background-color: #fff;
+    overflow: hidden;
+  }
+  .grid {
+    display: flex;
+    flex-wrap: wrap;
+  }
+</style>
+
+me: oh boy, I sure am glad I finished The Witness (2016) and don't have to solve any more puzzles!\
+the cohost witness puzzle:
+
+<div style="padding:{LINE_WIDTH*2}px;overflow:hidden">
+  <div style="width:{GRID_WIDTH * WIDTH + LINE_WIDTH}px;height:{GRID_WIDTH * HEIGHT + LINE_WIDTH}px;position:relative">
+    <div style="position:absolute;left:{GRID_WIDTH*WIDTH}px;top:{GRID_WIDTH*HEIGHT}px;width:{LINE_WIDTH*2.5}px;height:{LINE_WIDTH}px;background-color:rgba(0,0,0,0.15);z-index:999;pointer-events:none;border-radius:{LINE_WIDTH}px;transform:rotate(45deg);transform-origin:{LINE_WIDTH/2}px"/>
+    <div class="background" style="border-radius:{LINE_WIDTH/2}px">
+      <div style="left:{GRID_WIDTH/2+LINE_WIDTH/2}px;top:{GRID_WIDTH*2+GRID_WIDTH/2+LINE_WIDTH/2}px;position:absolute;z-index:999">
+        <div style="width:{(GRID_WIDTH-LINE_WIDTH)/4*2}px;height:{(GRID_WIDTH-LINE_WIDTH)/4*2}px;position:relative;bottom:{(GRID_WIDTH-LINE_WIDTH)/4}px;right:{(GRID_WIDTH-LINE_WIDTH)/4}px;display:flex;flex-wrap:wrap">
+          <div style="background-color:#ffd8a8;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;border-radius:5px;margin:2px"/>
+          <div style="background-color:#ffd8a8;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;border-radius:5px;margin:2px"/>
+          <div style="background-color:transparent;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;margin:2px"/>
+          <div style="background-color:#ffd8a8;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;border-radius:5px;margin:2px"/>
+        </div>
+      </div>
+      <div style="left:{GRID_WIDTH+GRID_WIDTH/2+LINE_WIDTH/2}px;top:{GRID_WIDTH/2+LINE_WIDTH/2}px;position:absolute;z-index:999">
+        <div style="width:{(GRID_WIDTH-LINE_WIDTH)/4*2}px;height:{(GRID_WIDTH-LINE_WIDTH)/4}px;position:relative;bottom:{(GRID_WIDTH-LINE_WIDTH)/4*0.5}px;right:{(GRID_WIDTH-LINE_WIDTH)/4*1}px;display:flex;flex-wrap:wrap">
+          <div style="background-color:#ffd8a8;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;border-radius:5px;margin:2px"/>
+          <div style="background-color:#ffd8a8;width:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;height:{(GRID_WIDTH-LINE_WIDTH)/4-4}px;border-radius:5px;margin:2px"/>
+        </div>
+      </div>
+
+      <div style="position:absolute;background-color:#fff;width:{LINE_WIDTH}px;height:{LINE_WIDTH}px;left:{GRID_WIDTH*2}px;top:{GRID_WIDTH/2}px;z-index:1000;"/>
+      
+      <div class="grid" style="width:{GRID_WIDTH * (WIDTH+1)}px;height:{GRID_WIDTH * (HEIGHT + 1)}px">
+        {#each Array((WIDTH + 1) * (HEIGHT + 1)).fill(0) as _}
+          <div style="width:{GRID_WIDTH}px;height:{GRID_WIDTH}px;border-left:{LINE_WIDTH}px solid rgba(0,0,0,0.15);border-top:{LINE_WIDTH}px solid rgba(0,0,0,0.15);z-index:999;pointer-events:none"/>
+        {/each}
+      </div>
+    </div>
+    <div style="width:{LINE_WIDTH*2}px;height:{LINE_WIDTH*2}px;background-color:rgb(131,37,79);margin:-{LINE_WIDTH/2}px;border-radius:{LINE_WIDTH}px;left:0;position:absolute;z-index:9999;pointer-events:none"/>
+    <Line at={[0,0]} width={WIDTH} height={HEIGHT} positions={[]} index={0}/>
+  </div>
+</div>
+
+<small>quick reset ⬇</small>
+
+---'''
+sends = [3]
+graphPos = [-336, 0]
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'Line'
+data.contents = '''
+<script>
+  import LineSegment from './LineSegment.svelte';
+
+  export let width;
+  export let height;
+  export let positions;
+  export let at;
+  export let from;
+  export let index;
+
+  const LINE_WIDTH = 15;
+  const GRID_WIDTH = 100;
+
+  // massively adds to the filesize but prevents you from going back multiple turns at a time
+  const GO_BACK_FIX = true;
+  // if you're near an exit, you can't _not_ exit - decreases filesize but is also a bit ?
+  const ALWAYS_EXIT = true;
+  
+  function getOffset() {
+    if (from === 'right') {
+      return `left:${GRID_WIDTH}px;`;
+    } else if (from === 'left') {
+      return `right:${GRID_WIDTH}px;`;
+    } else if (from === 'down') {
+      return `top:${GRID_WIDTH}px;`;
+    } else if (from === 'up') {
+      return `bottom:${GRID_WIDTH}px;`;
+    } else {
+      return '';
+    }
+  }
+
+  function getValidPositions() {
+    return [[[0, 1], 'down'], [[1, 0], 'right'], [[0, -1], 'up'], [[-1, 0], 'left']]
+      .map(([off, dir]) => [[at[0] + off[0], at[1] + off[1]], dir])
+      .filter(([newPos, dir]) =>
+        !(
+          ALWAYS_EXIT && arrayEquals(at, [2, 3]) ||
+          newPos[0] < 0 ||
+          newPos[1] < 0 ||
+          newPos[0] > width ||
+          newPos[1] > height ||
+          (arrayEquals(at, [2, 0]) && arrayEquals(newPos, [2, 1])) ||
+          (arrayEquals(at, [2, 1]) && arrayEquals(newPos, [2, 0])) ||
+          positions.find(([x, y]) => x === newPos[0] && y === newPos[1])
+        )
+      );
+  }
+
+  function arrayEquals(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+</script>
+
+<style>
+  details {
+    cursor: pointer;
+  }
+  summary {
+    display: flex;
+  }
+  summary > :global(*), details > :global(:not(summary):not(.root)) {
+    position: absolute;
+  }
+  details > :global(:not(summary):not(.root):not(.cover)) {
+    pointer-events: none;
+  }
+</style>
+
+<div class="root" style="position:relative;{getOffset()};width:0;height:0x">
+  {#each getValidPositions() as [newPos, dir]}
+    <details>
+      <summary>
+        <LineSegment preview={true} from={at} {dir} index={index+1}/>
+      </summary>
+      <LineSegment from={at} {dir} index={index+999}/>
+      {#each getValidPositions() as [newPos2, dir2]}
+        {#if dir2 !== dir}
+          {#if dir2 === 'right'}
+            <div class="cover" style="width:{GRID_WIDTH+LINE_WIDTH}px;height:{LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default"></div>
+          {/if}
+          {#if dir2 === 'down'}
+            <div class="cover" style="width:{LINE_WIDTH}px;height:{GRID_WIDTH+LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default"></div>
+          {/if}
+          {#if dir2 === 'up'}
+            <div class="cover" style="width:{LINE_WIDTH}px;height:{GRID_WIDTH+LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default;bottom:0;margin-bottom:-{LINE_WIDTH}px"></div>
+          {/if}
+          {#if dir2 === 'left'}
+            <div class="cover" style="width:{GRID_WIDTH+LINE_WIDTH}px;height:{LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default;right:0;margin-right:-{LINE_WIDTH}px"></div>
+          {/if}
+        {/if}
+      {/each}
+
+      {#if GO_BACK_FIX}
+        {#if from === 'right'}
+          <div class="cover" style="width:{GRID_WIDTH+LINE_WIDTH}px;height:{LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default;right:0;margin-right:-{LINE_WIDTH}px"></div>
+        {/if}
+        {#if from === 'down'}
+          <div class="cover" style="width:{LINE_WIDTH}px;height:{GRID_WIDTH+LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default;bottom:0;margin-bottom:-{LINE_WIDTH}px"></div>
+        {/if}
+        {#if from === 'up'}
+          <div class="cover" style="width:{LINE_WIDTH}px;height:{GRID_WIDTH+LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default"></div>
+        {/if}
+        {#if from === 'left'}
+          <div class="cover" style="width:{GRID_WIDTH+LINE_WIDTH}px;height:{LINE_WIDTH}px;background-color:#fff;z-index:{index+3};cursor:default"></div>
+        {/if}
+      {/if}
+      <svelte:self at={newPos} from={dir} width={width} height={height} positions={[...positions, at]} index={index+3}/>
+    </details>
+  {/each}
+  {#if at[0] === width && at[1] === height}
+    <details>
+      <summary>
+        <LineSegment preview={true} from={at} dir="exit" index={index+1}/>
+      </summary>
+      <LineSegment from={at} dir="exit" index={index+999}/>
+      <div style="inset:0;margin:-9999px;background-color:#fff;z-index:{index+3}"></div>
+      <div class="cover" style="z-index:99999;position:absolute;width:{GRID_WIDTH*width+LINE_WIDTH}px;height:{GRID_WIDTH*height+LINE_WIDTH}px;bottom:0;right:0;background-color:rgba(255,255,255,0.8);border-radius:{LINE_WIDTH/2}px;color:#000;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;margin-right:-{LINE_WIDTH}px;margin-bottom:-{LINE_WIDTH}px">
+        {#if arrayEquals(positions, [[0,0],[0,1],[1,1],[1,2],[0,2],[0,3],[1,3]])}
+          <b>🎉 you did it 🎉</b>
+        {:else}
+          <b>wrong!</b>
+          <i>try again? (you can undo by clicking on the solid lines!)</i>
+        {/if}
+      </div>
+    </details>
+  {/if}
+</div>'''
+namedSends = { '0' = ['Line'] }
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'LineSegment'
+data.contents = '''
+<script>
+  export let from;
+  export let dir;
+  export let preview;
+  export let index;
+
+  const LINE_WIDTH = 15;
+  const GRID_WIDTH = 100;
+
+  function getWidth() {
+    if (dir === 'right' || dir === 'left') {
+      return GRID_WIDTH + LINE_WIDTH;
+    } else if (dir === 'exit') {
+      return LINE_WIDTH * 2.5;
+    } else {
+      return LINE_WIDTH;
+    }
+  }
+  function getHeight() {
+    if (dir === 'up' || dir === 'down') {
+      return GRID_WIDTH + LINE_WIDTH;
+    } else {
+      return LINE_WIDTH;
+    }
+  }
+  
+  function getOffset() {
+    if (dir === 'right' || dir === 'exit') {
+      return `left:0`;
+    } else if (dir === 'left') {
+      return `right:0;margin-right:-${LINE_WIDTH}px`;
+    } else if (dir === 'down') {
+      return `top:0`;
+    } else if (dir === 'up') {
+      return `bottom:0;margin-bottom:-${LINE_WIDTH}px`;
+    } else {
+      return '';
+    }
+  }
+
+  function getTransforms() {
+    if (dir === 'exit') {
+      return `transform:rotate(45deg);transform-origin:${LINE_WIDTH/2}px`
+    } else {
+      return '';
+    }
+  }
+</script>
+
+<style>
+  .line {
+    background-color: #83254f;
+    position: absolute;
+  }
+  .preview {
+    opacity: 0.5;
+  }
+</style>
+
+<a class="line" class:preview={preview} style="width:{getWidth()}px;height:{getHeight()}px;border-radius:{LINE_WIDTH}px;z-index:{index};{getOffset()};{getTransforms()}"/>'''
+namedSends = { '0' = ['LineSegment'] }
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']

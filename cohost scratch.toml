@@ -1,0 +1,346 @@
+version = 1
+title = 'cohost scratch'
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<style>
+  .player-wrapper {
+    width: 360px;
+    height: 400px;
+    pointer-events: none !important;
+    position: relative;
+  }
+  .underlay-wrapper {
+    position: relative;
+  }
+  .underlay {
+    position: absolute;
+    inset: 0;
+  }
+
+  .button-row {
+    height: 2.75rem;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+
+    display: flex;
+    flex-direction: row;
+  }
+
+  .button {
+    width: 2rem;
+    height: 2rem;
+    padding: 0.375rem;
+    border-radius: 0.25rem;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    user-drag: none;
+    cursor: pointer;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+  .button.active {
+    background-color: hsla(215, 100%, 65%, 0.35);
+  }
+
+  .no-interact {
+    pointer-events: none;
+  }
+
+  .hidden {
+    position: absolute;
+    inset: 0;
+  }
+  .shown {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .shown {
+    font-size: 0;
+  }
+  .hidden {
+    pointer-events: none;
+  }
+  .yes-interact {
+    pointer-events: auto !important;
+  }
+</style>
+
+<script>
+  import Player from './Player.svelte';
+  import GreenFlag from './GreenFlag';
+  import StopAll from './StopAll';
+  import Editor from './Editor.svelte';
+</script>
+
+<div class="underlay-wrapper">
+  <div class="underlay">
+    <div class="button-row">
+      <img class="button green-flag no-interact" draggable="false" src={GreenFlag} tile="Go">
+      <img class="button stop-all" draggable="false" src={StopAll} title="Stop">
+    </div>
+    <Player active={false}/>
+  </div>
+</div>
+<details class="player-wrapper">
+  <summary class="shown">
+    <div class="button-row">
+      <img class="button green-flag yes-interact" draggable="false" src={GreenFlag} tile="Go">
+    </div>
+  </summary>
+  <div class="hidden">
+    <div class="button-row">
+      <img class="button green-flag active yes-interact" draggable="false" src={GreenFlag} tile="Go">
+      <img class="button stop-all" draggable="false" src={StopAll} title="Stop">
+    </div>
+    <div class="yes-interact">
+      <Player active={true}/>
+    </div>
+  </div>
+</details>
+
+<p>
+  am i doing the whole "css crimes" thing right?
+</p>
+
+<details>
+  <summary>
+    source code (in scratch, of course)
+  </summary>
+  <Editor/>
+</details>'''
+sends = [2]
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'Player'
+data.contents = '''
+<script>
+  export let active = false;
+  import ScratchCat from './ScratchCat';
+  import ScratchCatStill from './ScratchCatStill';
+</script>
+
+<style>
+  .player {
+    height: 360px;
+    width: 480px;
+    border-radius: 0.5rem;
+    border: 0.0625rem solid hsla(0, 0%, 0%, 0.15);
+    overflow: hidden;
+    background-color: #fff;
+    -ms-touch-action: none;
+    touch-action: none;
+    -webkit-box-sizing: content-box !important;
+    box-sizing: content-box !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+</style>
+
+<div class="player">
+  {#if !active}
+    <img src={ScratchCatStill} width="128px" height="auto"/>
+  {:else}
+    <div style="transform: translate(0px, 64px)">
+      <div style="animation: spin 6s steps(8) infinite">
+        <img src={ScratchCat} width="128px" height="auto" style="transform: translate(0px, -64px)"/>
+      </div>
+    </div>
+  {/if}
+</div>'''
+sends = [0]
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://staging.cohostcdn.org/attachment/2a79b9c0-4a3c-4f5c-b908-fd9e2db587cb/icon--green-flag.svg'
+data.language = 'text'
+namedSends = { '0' = ['GreenFlag'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://staging.cohostcdn.org/attachment/1b578b5c-4b69-4fba-a194-b5fc901e68b8/36fcc7dbca20720abcab01e49d4955f9.svg'
+data.language = 'text'
+namedSends = { '0' = ['StopAll'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://staging.cohostcdn.org/attachment/f3843155-09ba-4223-b666-ebadd2e64a1d/ezgif.com-gif-maker(1).gif'
+data.language = 'text'
+namedSends = { '0' = ['ScratchCat'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://staging.cohostcdn.org/attachment/06025b96-5e6c-4356-9b5b-4192030909bd/costume1.svg'
+data.language = 'text'
+namedSends = { '0' = ['ScratchCatStill'] }
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'Editor'
+data.contents = '''
+<script>
+  import bg from './bg';
+  import block1 from './block1';
+  import block2 from './block2';
+</script>
+
+<style>
+  .editor-wrapper {
+    height: 300px;
+    width: 480px;
+    border-radius: 0.5rem;
+    border: 0.0625rem solid hsla(0, 0%, 0%, 0.15);
+    overflow: auto;
+    background-color: #fff;
+    -ms-touch-action: none;
+    margin: 0;
+  }
+
+  .editor {
+    min-width: 100%;
+    min-height: 100%;
+    width: fit-content;
+    height: fit-content;
+    background-size: 9%;
+    padding: 1em;
+    padding-right: 150px;
+    padding-bottom: 150px;
+    position: relative;
+  }
+
+  img {
+    margin-top: 0;
+    margin-bottom: 0;
+  }
+
+  .resizable {
+    z-index: 1;
+    background-image: url('https://staging.cohostcdn.org/attachment/07d006ca-906f-4499-a89a-4528009f39e3/mover.png');
+    background-position: 100% 100%, 100% 100%;
+    background-repeat: no-repeat, no-repeat;
+    resize: both;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    justify-content: flex-end;
+    min-width: 18px;
+    min-height: 18px;
+  }
+
+  .resizable-content {
+    z-index: 0;
+    width: 0px;
+    height: 0px;
+    overflow: visible;
+    position: relative;
+    top: -15px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .resizable-wrapper {
+    width: min-content;
+    height: min-content;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-items: flex-end;
+  }
+
+  .note {
+    color: #575e75;
+    border: 0.0625rem solid hsla(0, 0%, 0%, 0.15);
+    width: 150px;
+    font-size: 14px;
+    min-height: 1em;
+    min-width: 40px;
+    max-height: fit-content;
+    border-radius: 7px;
+    overflow: hidden;
+  }
+  .note-inner {
+    padding-right: 0.5em;
+    padding-left: 0.5em;
+    background-color: #e4db8c;
+  }
+  .note-inner-inner {
+    display: inline-flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: center;
+    width: calc(100% - 14px);
+  }
+  .note-content {
+    padding: 1em;
+    line-height: 1;
+    background-color: #fef49c;
+    min-height: 100%;
+  }
+</style>
+
+<div class="editor-wrapper">
+  <div class="editor" style="background-image: url({bg})">
+    <div class="resizable-wrapper">
+      <div class="resizable"></div>
+      <div class="resizable-content">
+        <div style="width: 140px; height: 228.5px">
+          <img src={block1} width="140" height="228.5"/>
+        </div>
+      </div>
+    </div>
+    <div class="resizable-wrapper">
+      <div class="resizable" style="width: 185px; height: 0px"></div>
+      <div class="resizable-content">
+        <div style="width: 125.5px; height: 82.5px">
+          <img src={block2} width="125.5" height="82.5"/>
+        </div>
+      </div>
+    </div>
+    <div class="resizable-wrapper">
+      <div class="resizable" style="width: 185px; height: 95px"></div>
+      <div class="resizable-content">
+        <div>
+          <details class="note" open="true" style="
+    pointer-events: initial;
+    user-select: initial;">
+            <summary class="note-inner">
+              <span class="note-inner-inner"><b>x</b></span>
+            </summary>
+            <div class="note-content">
+              made by oatmealine - nov 12 2022
+            </div>
+          </details>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>'''
+namedSends = { '0' = ['Editor'] }
+
+[[modules]]
+plugin = 'source.file-data-url'
+data.url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAHgAAAB4CAYAAAA5ZDbSAAABbmlDQ1BpY2MAACiRdZE7SwNBFIW/REUxkSBaiFhsoWKRgCiIpcYiTRCJEYzaZDcvIRuX3Q0SbAUbi4CFaOOr8B9oK9gqCIIiiFj5A3w1EtY7RoiIzjJ7P87MucycAX+8aJhO8zCYJddOxKLafGpBa30iQJBOBvClDceanJmJ8+94v8Gn6nVE9fp/358jkMk6BvjahMcMy3aFJ4Tjq66leFO42yikM8L7wmFbDih8oXS9zo+K83V+VWwnE1PgVz21/A/Wf7BRsE3hIeF+s1g2vs+jbhLMluZmpfbK7MMhQYwoGjplliniEpFaksz+9g1/+aZZEY8hf4sKtjjyFMQbFrUsXbNSc6Jn5StSUbn/ztPJjY7Uuwej0PLgeS8D0LoFtarnfRx4Xu0Qmu7hrNTwr0hO42+iVxta/x6E1uHkvKHp23C6AT13VtpOf0lNMv25HDwfQ0cKuq6gfbGe1fc6R7eQXJMnuoSdXRiU/aGlT7Z7Z+jc6rMbAAAACXBIWXMAAC4jAAAuIwF4pT92AAABQklEQVR42u3XTWqFMBSA0avoQMGJ+9+jiOAPgnmmj7620A0YzjeSDHNIcq2O40hxt+97nOeZP6PrumiaJvT8PorbtsW6ru/FGxdwGVXzPKdlWeI+yT+LVRV938cwDKAfXp1Siuu6/iz+t6aHAtuCwq/oPGTlEztN0+cNHsfxa9DKV7UKGLIyZAat6/eBbtsWbkkn+Pfb+w2uwn6TwBqyBFiABViABViAAQuwAAuwAAuwAAMWYAEWYAEWYAEGLMACLMACLMACLMCABViABViABViAAQuwAAuwAAuwAAO2BYAFWIAFWIAFWIABC7AAC7AAC7AAAxZgARZgARZgARZgwAIswAIswAIswIAFWIAFWIAFWIABC7AAC7AAC7AACzBgARZgARZgARZgwAIswAIswAIswIAFWIAFWIAFWIAFGLAK6QWChzqhxS2GVwAAAABJRU5ErkJggg=='
+namedSends = { '0' = ['bg'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://oat.zone/f/block1.png'
+data.language = 'text'
+namedSends = { '0' = ['block1'] }
+
+[[modules]]
+plugin = 'source.text'
+data.contents = 'https://oat.zone/f/block2.png'
+data.language = 'text'
+namedSends = { '0' = ['block2'] }

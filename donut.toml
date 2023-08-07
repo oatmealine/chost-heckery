@@ -1,0 +1,371 @@
+version = 1
+title = 'donut'
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<style>
+  .container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #112;
+  }
+  .container-enclosure {
+    position: relative;
+    left: -12px;
+    top: -16px;
+    background-color: #112;
+    width: calc(100% + 24px);
+    height: 500px;
+    margin-bottom: -36px;
+  }
+
+  .center-contents {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .perspective {
+    transform: rotateX(75deg);
+  }
+  .perspective-side {
+    transform: rotateX(30deg);
+  }
+  .spin {
+    animation: spin 5s linear infinite;
+  }
+  .spin-y {
+  }
+
+  .append {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .append-to {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+  .overlay {
+    background: linear-gradient(to bottom, #CE2F13 0%, #C51A89 100%);
+    width: 100%;
+    height: 100%;
+    mix-blend-mode: multiply;
+  }
+  .box {
+    border: 180px solid #fff;
+    width: calc(100% + 360px);
+    height: calc(100% + 360px);
+    margin: -180px;
+    mix-blend-mode: luminosity;
+  }
+  .spin-1 {
+    animation: 15s spin linear infinite;
+    animation-delay: 0s;
+  }
+  .spin-2 {
+    animation: 15s spin linear infinite;
+    animation-delay: -5s;
+  }
+  .spin-3 {
+    animation: 15s spin linear infinite;
+    animation-delay: -10s;
+  }
+  .red {
+    border-color: #300;
+  }
+  .green {
+    border-color: #030;
+  }
+  .blue {
+    border-color: #00a;
+  }
+  .mult {
+    mix-blend-mode: multiply;
+  }
+  .add {
+    mix-blend-mode: screen;
+  }
+  .segment {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .segment-size {
+    width: 100%;
+    height: 100%;
+  }
+  .slide {
+    position: relative;
+    animation: 4s spin linear infinite;
+    transform: translate(64px, 0px);
+    left: -64px;
+    width: calc(100% + 64px);
+    height: 100%;
+  }
+  .slowspin {
+    animation: 20s spin linear infinite;
+  }
+  .slowspin-2 {
+    animation: 28s spin linear infinite;
+    animation-delay: -4.95s;
+    animation-direction: reverse;
+  }
+  .unslowspin {
+    animation: 20s spin linear infinite;
+    animation-direction: reverse;
+  }
+  .unslowspin-2 {
+    animation: 28s spin linear infinite;
+    animation-delay: 2s;
+  }
+  .slowscale {
+    animation: 4s spin ease-in-out infinite;
+    animation-direction: alternate;
+    transform: scale(1.4, 1.4);
+  }
+  .slowscale-2 {
+    animation: 5.2s spin ease-in-out infinite;
+    animation-direction: alternate;
+    transform: scale(1.4, 1.4);
+  }
+  .scale {
+    transform: scale(1.8, 1.8);
+  }
+  .rotate {
+    transform: rotate(55deg);
+  }
+  .offset-1 {
+    transform: translate(0px, 50px);
+  }
+  .offset-2 {
+    transform: translate(0px, -50px);
+  }
+
+  .opacity {
+    opacity: 0.09;
+  }
+
+  .glow {
+    filter: drop-shadow(0px 0px 2px white) drop-shadow(0px 0px 1px white) drop-shadow(0px 0px 12px white);
+  }
+  .slight-glow {
+    filter: drop-shadow(0px 0px 3px #D9E0FF) drop-shadow(0px 0px 16px #D9E0FF);
+  }
+
+  .text {
+    font-size: 16px;
+    line-height: 0.95;
+    color: #D9E0FF;
+    mix-blend-mode: color-dodge;
+    padding: 1em;
+    text-align: right;
+    height: 6em;
+    overflow: hidden;
+  }
+  .text-inner {
+    transform: translateY(-38.3em);
+  }
+  .text-inner-2 {
+    font-weight: bolder;
+    animation: 5s spin steps(21) infinite;
+    transform: translateY(36em);
+  }
+
+  pre {
+    background-color: transparent;
+  }
+</style>
+
+<script>
+  import Circle from './Circle.svelte';
+  import grad1 from './grad1';
+  import grad2 from './grad2';
+
+  function entries(i) {
+    return Array(i).fill(0).map((v,i) => i);
+  }
+
+  function mix(x, a, b) {
+    return a * (1 - x) + b * x
+  }
+  function mapVal(x, a, b) {
+    return mix((x * 0.5 + 0.5), a, b)
+  }
+  
+  const stack = 14;
+  const slice = 10;
+
+  const torusRadius = 140;
+  const torusThickness = 132;
+
+  const what = 0;
+</script>
+
+<div class="container-enclosure">
+  <div class="container">
+    <div class="append segment add opacity">
+      <div class="segment-size scale">
+        <div class="segment-size slowscale-2">
+          <div class="segment-size slowspin-2">
+            <div class="segment-size slide" style="background-image: url('{grad1}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="append segment add opacity">
+      <div class="segment-size scale">
+        <div class="segment-size slowscale" style="animation-delay: -22s">
+          <div class="segment-size unslowspin-2" style="animation-delay: -8.32s">
+            <div class="segment-size slide" style="background-image: url('{grad1}')">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="append segment add opacity">
+      <div class="segment-size scale">
+        <div class="segment-size rotate">
+          <div class="segment-size slowscale-2" style="animation-delay: -15.32s">
+            <div class="segment-size slowspin" style="animation-delay: -8.32s">
+              <div class="segment-size slide" style="background-image: url('{grad1}')">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="append-to">
+      <div class="append center-contents glow">
+        {#each entries(stack) as i}
+        <div style="transform: translateY({Math.sin((i/stack) * Math.PI * 2) * torusThickness/2}px)">
+          <div class="perspective">
+            <div class="spin">
+              <Circle
+                radius={mapVal(Math.cos((i/stack) * Math.PI * 2), torusRadius - torusThickness/2, torusRadius + torusThickness/2)} 
+                slice={slice}
+              />
+            </div>
+          </div>
+        </div>
+        {/each}
+        {#each entries(slice) as i}
+        <div class="perspective-side">
+          <div style="animation: spin 5s linear infinite; transform: rotateY(0.1deg); animation-delay: {((i+what)/slice)*5-5}s">
+            <div style="animation: spin 2.5s ease-in-out infinite; animation-direction: alternate; transform: translateY(-90px); animation-delay: {((i+what)/slice-0.75)*5}s">
+              <div style="transform: translateY(40px)">
+                <div style="transform: translateX(-{torusRadius * 1.04}px)">
+                  <Circle
+                    radius={torusThickness * 0.53}
+                    slice={stack}
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        {/each}
+      </div>
+    </div>
+    <div class="overlay append">
+  
+    </div>
+    <div class="append box red spin-1"></div>
+    <div class="append box green spin-2"></div>
+    <div class="append box blue spin-3"></div>
+
+    <div class="append text slight-glow"><div class="text-inner"><pre class="text-inner-2">
+
+cohost donut &lt;
+
+this is a polygonal  ;
+donut, rendering entirely  ;
+in your browser with just  ;
+plain CSS.  ;
+<br>edible &lt;
+<br>== Query for EDIBLE == ;
+STATUS : unknown  ;
+APPROXIMATION: unknown  ;
+;
+SUGGESTED:  ;
+why not take a   ;
+bite?   ;
+;
+made by  ;
+oatmealine  ;
+BEST BY 2022 nov 13  ;<br>
+cohost donut &lt;
+<br>this is a polygonal  ;
+donut, rendering entirely  ;
+in your browser with just  ;
+plain CSS.  ;
+</pre></div></div>
+  </div>
+</div>'''
+sends = [2]
+
+[[modules]]
+plugin = 'source.svelte-component'
+data.name = 'Circle'
+data.contents = '''
+<style>
+
+  .block {
+    height: 0px;
+    border-bottom: 2px solid #fff;
+  }
+  
+  .append {
+    position: absolute;
+  }
+</style>
+
+<script>
+  function entries(i) {
+    return Array(i).fill(0).map((v,i) => i);
+  }
+  
+  export let radius;
+  export let slice = 16;
+
+  const circumference = 2 * Math.PI * radius;
+  const blockSize = circumference/slice;
+</script>
+
+<div class="append-to">
+  {#each entries(slice) as i}
+  <div class="append" style="transform: translateX({-blockSize/2}px) rotate({i/slice*360}deg);">
+    <div style="transform: translateY({radius}px)">
+      <div>
+        <div class="block" style="width: {blockSize}px"></div>
+      </div>
+    </div>
+  </div>
+  {/each}
+</div>'''
+namedSends = { '0' = ['Circle'] }
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']
+
+[[modules]]
+plugin = 'source.file-data-url'
+data.url = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAABcmlDQ1BpY2MAACiRdZE9S8NQFIbftopiWzroIOoQsIpDC0VBHLUOXYqUWsGqS3KbtEKShpsUKa6Ci0PBQXTxa/Af6Cq4KgiCIog4+QP8WqTEc5tCi7Qn3JyH9573cO+5gD+tM8PuSQCG6fBsKimt5tekvncEEYYPoxiXmW0tZDJpdI2fR6qkeIiLXt3rOkawoNoM8PUTzzKLO8TzxOktxxK8RzzESnKB+IQ4xumAxLdCVzx+E1z0+Eswz2UXAb/oKRXbWGljVuIG8RRx1NArrHkecZOQaq4sUx6hNQYbWaSQhAQFFWxCh4M4ZZNm1tmXaPiWUCYPo7+FKjg5iiiRN0ZqhbqqlDXSVfp0VMXc/8/T1mamve6hJND76rqfE0DfPlCvue7vqevWz4DAC3BttvxlmtPcN+m1lhY9BiI7wOVNS1MOgKtdYPjZkrnckAK0/JoGfFwA4TwweA8MrHuzau7j/AnIbdMT3QGHR8Ak1Uc2/gDJnmfx2BoHJQAAAAlwSFlzAAAuIwAALiMBeKU/dgAAAIpJREFUeNrt0DEKwCAQBMBLsND/P9YrhKQ3BqyTWdhm2WqOiLhqrTG3tRarfW4pZfv79svMR3vvy331G2Nsf+ftjJ8HAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAB8ITfdP16X4RNQzQAAAABJRU5ErkJggg=='
+namedSends = { '0' = ['grad1'] }
+
+[[modules]]
+plugin = 'source.file-data-url'
+data.url = 'data:image/png;base64,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'
+namedSends = { '0' = ['grad2'] }

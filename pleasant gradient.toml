@@ -1,0 +1,60 @@
+version = 1
+title = 'pleasant gradient'
+
+[[modules]]
+plugin = 'source.text'
+data.contents = '''
+<style>
+  .image {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 314 / 241;
+    background-size: 100%;
+    overflow: hidden;
+  }
+  .gradient-container-container {
+    transform: translate(240px, 300px)
+  }
+  .gradient-container {
+    width: 190px;
+    height: 357px;
+    transform: perspective(600px) rotateX(-50deg) rotateY(-30deg) translate(40px, -155px);
+    overflow: hidden;
+    filter: drop-shadow(0px 0px 8px #D3AD6F) drop-shadow(0px 0px 12px #DB4F89);
+  }
+  .gradient {
+    width: 190px;
+    height: 1071px;
+    background: linear-gradient(to bottom, #DB4F89 0%, #D3AD6F, #DB4F89, #D3AD6F 100%);
+  }
+  .gradient-mover {
+    width: 190px;
+    height: 1071px;
+
+    animation: 4s spin linear infinite;
+    transform: translate(0px, -714px);
+  }
+</style>
+
+<p>i love how making cool-looking vfx-adjacent chosts has just turned into</p>
+
+<blockquote>hmm, how do i make this look cool</blockquote>
+
+<div class="image" style="background-image:url('https://staging.cohostcdn.org/attachment/4d61fb0f-9708-4a59-a61f-732017d7eb6c/pleasant-gradient.png')" title="Image of a front door camera recording. In front of it is a rectangle, to which an animated gradient is goofily fit into. A green arrow is pointing to it, with the caption: &quot;this pleasant gradient shows up at your front door&quot;">
+  <div class="gradient-container-container">
+    <div class="gradient-container">
+      <div class="gradient-mover">
+        <div class="gradient"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<p>if you're unsure on how to make something look cool, literally just slap a gradient on it with multiply blend mode applied. instantly win 1,500 robux</p>'''
+data.language = 'html'
+sends = [1]
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']
