@@ -1,0 +1,45 @@
+version = 1
+title = 'gay sex'
+
+[[modules]]
+plugin = 'source.svelte'
+data.contents = '''
+<script>
+  function entries(i) {
+    return Array(i).fill(0).map((v,i) => i);
+  }
+
+  const SEX = 20;
+</script>
+
+<style>
+  .container {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  * {
+    transform-style: preserve-3d;
+  }
+</style>
+
+<div style="filter:drop-shadow(rgba(0, 0, 0, 0.5) 0px 0px 10px)">
+<div style="height:150px;font-size:5rem;perspective:500px">
+  {#each entries(SEX) as i}
+    <div class="container">
+      <div class="gaysex" style="animation:0.8s spin infinite linear;transform:rotateY(0.1deg)">
+        <div class="text" style="transform: translateZ({i / SEX * 40 - 20}px);color:hsl(30,{(Math.pow(Math.abs(i/(SEX-1)-0.5)+0.5, 10)*0.25+0.5)*100}%,{(Math.pow(Math.abs(i/(SEX-1)-0.5)+0.5, 10)*0.3+0.5)*100}%)">
+          gay sex
+        </div>
+      </div>
+    </div>
+  {/each}
+</div>
+</div>'''
+sends = [1]
+
+[[modules]]
+plugin = 'transform.style-inliner'
+data.mode = 'attr'
+sends = ['output']
